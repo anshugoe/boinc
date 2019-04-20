@@ -354,7 +354,9 @@ void ACTIVE_TASK_SET::get_memory_usage() {
     int retval;
     static bool first = true;
     static double last_cpu_time;
+    static double swc_last_cpu_time;
     double diff=0;
+    double swc_boinc_total;
 
     if (!first) {
         diff = gstate.now - last_mem_time;
@@ -440,6 +442,7 @@ void ACTIVE_TASK_SET::get_memory_usage() {
                 boinc_total.working_set_size_smoothed += pi.working_set_size_smoothed;
                 boinc_total.swap_size += pi.swap_size;
                 boinc_total.page_fault_rate += pi.page_fault_rate;
+                swc_boinc_total=pi.user_time+pi.kernel_time;
             }
         }
     }
@@ -497,8 +500,15 @@ void ACTIVE_TASK_SET::get_memory_usage() {
         );
     }
     double new_cpu_time = pi.user_time + pi.kernel_time;
+    double lastTotalUser, lastTotalUserLow, lastTotalSys, lastTotalIdle;
+    FILE* file = fopen("/proc/stat", "r");
+    fscanf(file, "cpu %llu %llu %llu %llu", &lastTotalUser, &lastTotalUserLow,
+        &lastTotalSys, &lastTotalIdle);
+    double swc_new_cpu_time=lastTotalUser+lastTotalSys;
+    fclose(file);
+
     if (!first) {
-        non_boinc_cpu_usage = (new_cpu_time - last_cpu_time)/(diff*gstate.host_info.p_ncpus);
+        non_boinc_cpu_usage = (swc_new_cpu_time - swc_last_cpu_time - swc_boinc_total )/(diff*gstate.host_info.p_ncpus);
         // processes might have exited in the last 10 sec,
         // causing this to be negative.
         if (non_boinc_cpu_usage < 0) non_boinc_cpu_usage = 0;
@@ -509,6 +519,7 @@ void ACTIVE_TASK_SET::get_memory_usage() {
         }
     }
     last_cpu_time = new_cpu_time;
+    swc_last_cpu_time = swc_new_cpu_time;
     first = false;
 }
 

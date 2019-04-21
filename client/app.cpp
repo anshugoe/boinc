@@ -502,7 +502,7 @@ void ACTIVE_TASK_SET::get_memory_usage() {
     double new_cpu_time = pi.user_time + pi.kernel_time;
     double lastTotalUser, lastTotalUserLow, lastTotalSys, lastTotalIdle;
     FILE* file = fopen("/proc/stat", "r");
-    fscanf(file, "cpu %llu %llu %llu %llu", &lastTotalUser, &lastTotalUserLow,
+    fscanf(file, "cpu %d %d %d %d", &lastTotalUser, &lastTotalUserLow,
         &lastTotalSys, &lastTotalIdle);
     double swc_new_cpu_time=lastTotalUser+lastTotalSys;
     fclose(file);

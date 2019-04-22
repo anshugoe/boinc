@@ -514,7 +514,7 @@ void ACTIVE_TASK_SET::get_memory_usage() {
         if (non_boinc_cpu_usage < 0) non_boinc_cpu_usage = 0;
         if (log_flags.mem_usage_debug) {
             msg_printf(NULL, MSG_INFO,
-                "[mem_usage] non-BOINC CPU usage: %.2f%%", non_boinc_cpu_usage*100
+                "[mem_usage] non-BOINC CPU usage: %llu", non_boinc_cpu_usage*100
             );
         }
     }

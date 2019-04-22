@@ -81,7 +81,7 @@ using std::min;
 double exclusive_app_running = 0;
 double exclusive_gpu_app_running = 0;
 int gpu_suspend_reason;
-double non_boinc_cpu_usage;
+unsigned long long non_boinc_cpu_usage;
 
 ACTIVE_TASK::~ACTIVE_TASK() {
 #ifndef SIM
@@ -354,7 +354,7 @@ void ACTIVE_TASK_SET::get_memory_usage() {
     int retval;
     static bool first = true;
     static double last_cpu_time;
-    static double swc_last_cpu_time;
+    static unsigned long long swc_last_cpu_time;
     double diff=0;
     double swc_boinc_total;
 
@@ -500,11 +500,11 @@ void ACTIVE_TASK_SET::get_memory_usage() {
         );
     }
     double new_cpu_time = pi.user_time + pi.kernel_time;
-    double lastTotalUser, lastTotalUserLow, lastTotalSys, lastTotalIdle;
+    unsigned long long lastTotalUser, lastTotalUserLow, lastTotalSys, lastTotalIdle;
     FILE* file = fopen("/proc/stat", "r");
-    fscanf(file, "cpu %d %d %d %d", &lastTotalUser, &lastTotalUserLow,
+    fscanf(file, "cpu %llu %llu %llu %llu", &lastTotalUser, &lastTotalUserLow,
         &lastTotalSys, &lastTotalIdle);
-    double swc_new_cpu_time=lastTotalUser+lastTotalSys;
+    unsigned long long swc_new_cpu_time=lastTotalUser+lastTotalSys;
     fclose(file);
 
     if (!first) {
